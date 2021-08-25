@@ -5,10 +5,11 @@
 #define DNS_MAX_LEN 255
 struct entry {
 	uint32_t key;
-	char dn[DNS_MAX_LEN + 1];
-	struct entry *nxt;
+	void *nxt;
+	...
 };
 ```
+- please make sure memcpy will deliver a deep copy of your entry
 
 ## Functions
 - int map_init(struct map *map, size_t entry_size, uint16_t increm);
