@@ -2,7 +2,6 @@
 
 ## Entry data structure
 ```sh=
-#define DNS_MAX_LEN 255
 struct entry {
 	uint32_t key;
 	void *nxt;
