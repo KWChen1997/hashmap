@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "hash.h"
 
-#define BUCKETINCREM 3
+#define BUCKETINCREM 100
 
 uint32_t hash1(uint32_t key, uint32_t cap){
 	const uint32_t prime = 31;
@@ -71,6 +71,7 @@ uint32_t insert(struct map *map, struct entry *entry){
 int expand(struct map *map){
 	int i = 0;
 	uint32_t oldcap = map->cap;
+	char *oldocc = map->occupied;
 	map->cap += BUCKETINCREM;
 
 	struct entry *oldlist = map->list;
@@ -81,10 +82,6 @@ int expand(struct map *map){
 	}
 	memset(map->list, 0, sizeof(struct entry) * map->cap);
 
-
-	if(map->occupied)
-		free(map->occupied);
-
 	map->occupied = (char*)malloc(sizeof(char) * map->cap);
 	if(map->occupied == NULL){
 		perror("expand malloc 2");
@@ -94,10 +91,25 @@ int expand(struct map *map){
 
 	map->count = 0;
 	for(i = 0; i < oldcap; i++){
+		if(!oldocc[i])
+			continue;
 		insert(map, oldlist + i);
 	}
 	
-	free(oldlist);
+	if(oldlist)
+		free(oldlist);
+	if(oldocc)
+		free(oldocc);
 
 	return 0;
+}
+
+void printmap(struct map *map){
+	int i = 0;
+	for(i = 0; i < map->cap; i++){
+		if(!map->occupied[i])
+			continue;
+		printf("%d ip 0x%x dn %s\n", i, map->list[i].ip, map->list[i].dn);
+	}
+	return;
 }

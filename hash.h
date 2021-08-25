@@ -26,4 +26,6 @@ uint32_t find(struct map *map, uint32_t key);
 uint32_t insert(struct map *map, struct entry *entry);
 int expand(struct map *map);
 
+void printmap(struct map *map);
+
 #endif
