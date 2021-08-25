@@ -8,22 +8,22 @@
 #define LOAD_FACTOR 0.75
 
 struct entry {
-	uint32_t ip;			// key
+	uint32_t key;			// key
 	char dn[DNS_MAX_LEN + 1];	// value
+	struct entry *nxt;
 } __attribute__((packed));
 
 struct map {
 	uint32_t cap;
-	char *occupied;
-	struct entry *list;
+	void **mapping;
+	void *head;
 	uint32_t count;
 };
 
 int map_init(struct map *map);
-
-uint32_t hash1(uint32_t key, unsigned int cap); 
-uint32_t find(struct map *map, uint32_t key);
-uint32_t insert(struct map *map, struct entry *entry);
+uint32_t hash(uint32_t key, unsigned int cap); 
+void **find(struct map *map, uint32_t key);
+int insert(struct map *map, struct entry *entry);
 int expand(struct map *map);
 
 void printmap(struct map *map);

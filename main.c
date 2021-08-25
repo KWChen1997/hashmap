@@ -12,7 +12,7 @@ int main(){
 	uint32_t ip;
 	for(i = 0; i < 20; i++){
 		ip = rand();
-		insert(&map, &(struct entry){.ip = ip, .dn = "localhost"});
+		insert(&map, &(struct entry){.key = ip, .dn = "localhost", .nxt = NULL});
 	}
 
 	printmap(&map);
