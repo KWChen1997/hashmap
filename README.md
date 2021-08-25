@@ -8,7 +8,7 @@ struct entry {
 	...
 };
 ```
-- please make sure memcpy will deliver a deep copy of your entry
+- please make sure memcpy will deep copy of your entry
 
 ## Functions
 - int map_init(struct map *map, size_t entry_size, uint16_t increm);
