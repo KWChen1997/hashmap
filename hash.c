@@ -59,6 +59,10 @@ void **find(struct map *map, uint32_t key){
 	return map->mapping + hashval;
 }
 
+/*
+ * insert a new entry into the map
+ * */
+
 int insert(struct map *map, struct node *entry){
 	if((double)map->count/map->cap >= LOAD_FACTOR){
 		if(expand(map) == -1){
