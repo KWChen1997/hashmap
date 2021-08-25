@@ -11,7 +11,7 @@ struct entry {
 ```
 
 ## Functions
-- int map_init(struct map *map);
+- int map_init(struct map *map, size_t entry_size, uint16_t increm);
 	- Initialize the map data structure
 	- Return Value
 		- If success, 0 will be returned. If failed, 1 will be returned.
@@ -23,7 +23,7 @@ struct entry {
 	- Find the empty slot or the slot of the key
 	- Return Value
 		- If there is a hit, the return pointer will point to the address of the entry. If it is a miss, the return pointer will point to a NULL address
-- uint32_t insert(struct map *map, struct entry *entry);
+- uint32_t insert(struct map *map, struct node *entry);
 	- Insert the entry into the map
 	- Return value
 		- If success, 0 will be returned. If failed, 1 will be returned.
@@ -31,6 +31,4 @@ struct entry {
 	- expand the bucket size of the map and rehashing
 	- Return Value
 		- If success, 0 will be returned. If failed, 1 will be returned.
-- void printmap(struct map *map);
-	- Print out all the entries in the map
 
