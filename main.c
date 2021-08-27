@@ -16,9 +16,10 @@ int main(){
 	char buf[16];
 	struct ip2dn tmp;
 	for(i = 0; i < 20; i++){
-		ip = rand();
+		ip = i + 1;
 		snprintf(buf,16,"0x%x",ip);
-		tmp.ip = ip;
+		memset(&tmp, 0, sizeof(struct ip2dn));
+		tmp.key.ip = ip;
 		strncpy(tmp.dn,buf,16);
 		tmp.nxt = NULL;
 		insert(&ip2dn, (struct node*)&tmp);
@@ -29,7 +30,8 @@ int main(){
 	struct stat tmpstat;
 
 	for(i = 0; i < 20; i++){
-		tmpstat.port = i + 1;
+		union key tmpkey = {.server.name="localhost", .server.port=i+1, .server.proto = 17};
+		memcpy(&tmpstat.key,&tmpkey,sizeof(union key));
 		tmpstat.nxt = NULL;
 		tmpstat.cnt = rand();
 		tmpstat.intvl_cnt = rand();
@@ -44,11 +46,11 @@ int main(){
 
 	struct ip2dn *ptr;
 	while(scanf("%u", &ip) != 0){
-		ptr = *find(&ip2dn, ip);
-		if(ptr == NULL || ptr->ip != ip)
+		ptr = *find(&ip2dn, &(union key){.ip = ip});
+		if(ptr == NULL || ptr->key.ip != ip)
 			printf("Miss\n");
 		else
-			printf("key %u dn %s\n", ptr->ip, ptr->dn);
+			printf("key %u dn %s\n", ptr->key.ip, ptr->dn);
 	}
 	return 0;
 }

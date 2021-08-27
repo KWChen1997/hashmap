@@ -13,12 +13,12 @@
  * return value: the hash value
  * */
 
-uint32_t hash(uint32_t key, uint32_t cap){
+uint32_t hash(union key *key, uint32_t cap){
 	const uint32_t prime = 31;
 	int i = 0;
-	int l = sizeof(uint32_t);
+	int l = sizeof(union key);
 	uint32_t hashval = 0;
-	unsigned char *tmp = (unsigned char*) &key;
+	uint8_t *tmp = (uint8_t*) &key;
 	for(i = 0; i < l; i++){
 		hashval = (hashval * prime + *(tmp + i)) % cap;
 	}
@@ -54,7 +54,7 @@ int map_init(struct map *map, size_t entry_size, uint16_t increm){
  * return value: the address where stores the item's "address"
  * */
 
-void **find(struct map *map, uint32_t key){
+void **find(struct map *map, union key *key){
 	uint32_t hashval = hash(key, map->cap);
 	return map->mapping + hashval;
 }
@@ -70,7 +70,10 @@ int insert(struct map *map, struct node *entry){
 			return -1;
 		}
 	}
-	void **ptr = find(map, entry->key);
+	void **ptr = find(map, &entry->key);
+	while(*ptr != NULL){
+		ptr++;
+	}
 	if(*ptr == NULL){
 		struct node *new = (struct node*)malloc(map->entry_size);
 		memcpy(new, entry, map->entry_size);
@@ -100,7 +103,7 @@ int expand(struct map *map){
 	struct node *cur = (struct node*)map->head;
 	uint32_t hashval;
 	while(cur != NULL){
-		hashval = hash(cur->key, newcap);
+		hashval = hash(&cur->key, newcap);
 		map->mapping[hashval] = cur;
 		cur = cur->nxt;
 	}
@@ -117,7 +120,7 @@ int expand(struct map *map){
 void ip2dn_print(struct map *map){
 	struct ip2dn *cur = (struct ip2dn*)map->head;
 	while(cur != NULL){
-		printf("key %u dn %s\n", cur->ip, cur->dn);
+		printf("key %u dn %s\n", cur->key.ip, cur->dn);
 		cur = cur->nxt;
 	}
 	return;
@@ -126,8 +129,16 @@ void ip2dn_print(struct map *map){
 void p2s_print(struct map *map){
 	struct stat *cur = (struct stat*)map->head;
 	while(cur != NULL){
-		printf("port %u cnt %d intvl_cnt %d proto %u mean %f std_dev %f\n", cur->port, cur->cnt, cur->intvl_cnt, cur->proto, cur->mean, cur->std_dev);
+		printf("port %u cnt %d intvl_cnt %d proto %u mean %f std_dev %f\n", cur->key.server.port, cur->cnt, cur->intvl_cnt, cur->proto, cur->mean, cur->std_dev);
 		cur = cur->nxt;
+	}
+	return;
+}
+
+void mapping_print(struct map *map){
+	int i = 0;
+	for(i = 0; i < map->cap; i++){
+		printf("0x%p\n",map->mapping[i]);
 	}
 	return;
 }
