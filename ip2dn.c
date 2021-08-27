@@ -36,7 +36,7 @@ uint32_t hash(uint32_t key, uint32_t cap){
  * return value: 0 for success, -1 for failure
  * */
 
-int map_init(struct map *map, uint16_t increm){
+int map_init(struct map *map, uint32_t increm){
 	map->cap = increm;
 	map->count = 0;
 	map->increm = increm;
