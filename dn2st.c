@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <arpa/inet.h>
-#include "ip2dn.h"
+#include "dn2st.h"
 
 /*
  * Calculate the hash value of the given key
@@ -14,12 +14,12 @@
  * return value: the hash value
  * */
 
-uint32_t hash(uint32_t key, uint32_t cap){
+uint32_t dn2st_hash(struct key *key, uint32_t cap){
 	const uint32_t prime = 31;
 	int i = 0;
-	int l = sizeof(uint32_t);
+	int l = sizeof(struct key);
 	uint32_t hashval = 0;
-	uint8_t *tmp = (uint8_t*) &key;
+	uint8_t *tmp = (uint8_t*) key;
 	for(i = 0; i < l; i++){
 		hashval = (hashval * prime + *(tmp + i)) % cap;
 	}
@@ -36,16 +36,16 @@ uint32_t hash(uint32_t key, uint32_t cap){
  * return value: 0 for success, -1 for failure
  * */
 
-int ip2dn_map_init(struct ip2dn_map *map, uint32_t increm){
+int dn2st_map_init(struct dn2st_map *map, uint32_t increm){
 	map->cap = increm;
 	map->count = 0;
 	map->increm = increm;
-	map->list = (struct ip2dn*)malloc(sizeof(struct ip2dn) * map->cap);
+	map->list = (struct dn2st*)malloc(sizeof(struct dn2st) * map->cap);
 	if(map->list == NULL){
 		perror("map init malloc");
 		return -1;
 	}
-	memset(map->list, 0, sizeof(struct ip2dn) * map->cap);
+	memset(map->list, 0, sizeof(struct dn2st) * map->cap);
 	return 0;
 }
 
@@ -54,10 +54,10 @@ int ip2dn_map_init(struct ip2dn_map *map, uint32_t increm){
  * return value: the address where stores the item's "address"
  * */
 
-struct ip2dn *ip2dn_find(struct ip2dn_map *map, uint32_t key){
-	uint32_t hashval = hash(key, map->cap);
-	struct ip2dn *res = map->list + hashval;
-	while(res->valid && res->ip != key){
+struct dn2st *dn2st_find(struct dn2st_map *map, struct key *key){
+	uint32_t hashval = dn2st_hash(key, map->cap);
+	struct dn2st *res = map->list + hashval;
+	while(res->valid && !(res->key.port == key->port && res->key.proto == key->proto && strcmp(res->key.dn, key->dn) == 0)){
 		hashval = (hashval + 1) % map->cap;
 		res = map->list + hashval;
 	}
@@ -68,16 +68,16 @@ struct ip2dn *ip2dn_find(struct ip2dn_map *map, uint32_t key){
  * insert a new entry into the map
  * */
 
-int ip2dn_insert(struct ip2dn_map *map, struct ip2dn *entry){
+int dn2st_insert(struct dn2st_map *map, struct dn2st *entry){
 	if((double)map->count/map->cap >= LOAD_FACTOR){
-		if(ip2dn_expand(map) == -1){
-			perror("ip2dn_expand");
+		if(dn2st_expand(map) == -1){
+			perror("expand");
 			return -1;
 		}
 	}
 
-	struct ip2dn *res = ip2dn_find(map, entry->ip);
-	memcpy(res, entry, sizeof(struct ip2dn));
+	struct dn2st *res = dn2st_find(map, &entry->key);
+	memcpy(res, entry, sizeof(struct dn2st));
 	res->valid = 1;
 	map->count ++;
 	return 0;
@@ -88,21 +88,21 @@ int ip2dn_insert(struct ip2dn_map *map, struct ip2dn *entry){
  * return value: 0 for success, -1 for failure
  * */
 
-int ip2dn_expand(struct ip2dn_map *map){
-	struct ip2dn *oldlist = map->list;
+int dn2st_expand(struct dn2st_map *map){
+	struct dn2st *oldlist = map->list;
 	uint32_t oldcap = map->cap;
 	map->cap = map->cap + map->increm;
-	map->list = (struct ip2dn*)malloc(sizeof(struct ip2dn) * map->cap);
+	map->list = (struct dn2st*)malloc(sizeof(struct dn2st) * map->cap);
 	if(map->list == NULL){
 		perror("malloc");
 		return -1;
 	}
-	memset(map->list, 0, sizeof(struct ip2dn) * map->cap);
+	memset(map->list, 0, sizeof(struct dn2st) * map->cap);
 	map->count = 0;
 	int i = 0;
 	for(i = 0; oldlist != NULL && i < oldcap; i++){
 		if(oldlist[i].valid)
-			ip2dn_insert(map,oldlist + i);
+			dn2st_insert(map,oldlist + i);
 	}
 
 	if(oldlist)
@@ -111,12 +111,12 @@ int ip2dn_expand(struct ip2dn_map *map){
 	return 0;
 }
 
-void ip2dn_print(struct ip2dn_map *map){
+void dn2st_print(struct dn2st_map *map){
 	int i = 0;
 	int j = 0;
 	for(i = 0; i < map->cap; i++){
 		if(map->list[i].valid){
-			printf("ip %u.%u.%u.%u dn %s\n", NIPQUAD(map->list[i].ip), map->list[i].dn);
+			printf("dn %s port %d proto %d cnt %d intvl_cnt %d mean %f std_dev %f\n", map->list[i].key.dn, map->list[i].key.port, map->list[i].key.proto, map->list[i].cnt, map->list[i].intvl_cnt, map->list[i].mean, map->list[i].std_dev);
 			j++;
 		}
 	}

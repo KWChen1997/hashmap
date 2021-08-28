@@ -4,25 +4,46 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include "ip2dn.h"
+#include "dn2st.h"
 
 
 int main(){
-
-	struct map ip2dn;
-	map_init(&ip2dn, 100);
+	struct ip2dn_map ip2dn;
+	ip2dn_map_init(&ip2dn, 100);
 	int i = 0;
 	uint32_t ip;
 	char buf[16];
-	struct ip2dn tmp;
-	for(i = 0; i < 10000; i++){
+	/*
+	for(i = 0; i < 1000; i++){
+		struct ip2dn tmp;
 		ip = rand();
 		snprintf(buf,16,"0x%x",ip);
 		memset(&tmp, 0, sizeof(struct ip2dn));
 		tmp.ip = ip;
 		strncpy(tmp.dn,buf,16);
-		insert(&ip2dn, &tmp);
+		ip2dn_insert(&ip2dn, &tmp);
 	}
 	ip2dn_print(&ip2dn);
+	*/
+	struct dn2st_map dn2st;
+	dn2st_map_init(&dn2st, 10);
+	for(i = 0; i < 100; i++){
+		struct dn2st tmp;
+		ip = rand();
+		snprintf(buf,16,"0x%x",ip);
+		memset(&tmp, 0, sizeof(struct dn2st));
+		strncpy(tmp.key.dn,buf,16);
+		tmp.key.port = rand() % 65536;
+		tmp.key.proto = 17;
+		tmp.cnt = rand();
+		tmp.intvl_cnt = rand();
+		tmp.mean = 1.0 * rand() / rand();
+		tmp.std_dev = 1.0 * rand() / rand();
+		dn2st_insert(&dn2st, &tmp);
+	}
+
+	dn2st_print(&dn2st);
+	
 	
 /*
 	struct ip2dn *res;

@@ -28,21 +28,21 @@ struct ip2dn {
 	uint32_t ip;			// key
 	char dn[DNS_MAX_LEN + 1];	// value
 	char valid;
-} __attribute__((packed));
+};
 
-struct map {
+struct ip2dn_map {
 	uint32_t cap;
 	uint32_t count;
 	uint32_t increm;
 	struct ip2dn *list;
 }__attribute__((packed));
 
-int map_init(struct map *map, uint32_t increm);
-uint32_t hash(uint32_t key, unsigned int cap);
-struct ip2dn *find(struct map *map, uint32_t key);
-int insert(struct map *map, struct ip2dn *entry);
-int expand(struct map *map);
+int ip2dn_map_init(struct ip2dn_map *map, uint32_t increm);
+uint32_t ip2dn_hash(uint32_t key, unsigned int cap);
+struct ip2dn *ip2dn_find(struct ip2dn_map *map, uint32_t key);
+int ip2dn_insert(struct ip2dn_map *map, struct ip2dn *entry);
+int ip2dn_expand(struct ip2dn_map *map);
 
-void ip2dn_print(struct map *map);
+void ip2dn_print(struct ip2dn_map *map);
 
 #endif
