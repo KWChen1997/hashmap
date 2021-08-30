@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <arpa/inet.h>
+#include <time.h>
 #include "dn2st.h"
 
 /*
@@ -117,6 +118,11 @@ void dn2st_print(struct dn2st_map *map){
 	for(i = 0; i < map->cap; i++){
 		if(map->list[i].valid){
 			printf("dn %s port %d proto %d cnt %d intvl_cnt %d mean %f std_dev %f\n", map->list[i].key.dn, map->list[i].key.port, map->list[i].key.proto, map->list[i].cnt, map->list[i].intvl_cnt, map->list[i].mean, map->list[i].std_dev);
+			struct abntraf *cur = map->list[i].ablist;
+			while(cur != NULL){
+				printf("cnt %d time %s", cur->cnt, asctime(gmtime(&cur->t.tv_sec)));
+				cur = cur->nxt;
+			}	
 			j++;
 		}
 	}

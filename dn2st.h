@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/time.h>
 
 #ifndef NIPQUAD
 #define NIPQUAD(addr) \
@@ -35,6 +36,12 @@ struct key {
 	int proto;
 };
 
+struct abntraf {
+	int cnt;
+	struct timeval t;
+	struct abntraf *nxt;
+};
+
 struct dn2st {
 	struct key key;
 	int cnt;
@@ -42,6 +49,7 @@ struct dn2st {
 	struct node *intvl_cnts;
 	float mean;
 	float std_dev;
+	struct abntraf *ablist;
 	char valid;
 };
 

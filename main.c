@@ -3,13 +3,15 @@
 #include <stdint.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include "ip2dn.h"
 #include "dn2st.h"
 
 
 int main(){
 	struct ip2dn_map ip2dn;
-	ip2dn_map_init(&ip2dn, 100);
+	ip2dn_map_init(&ip2dn, 5);
 	int i = 0;
 	uint32_t ip;
 	char buf[16];
@@ -26,8 +28,10 @@ int main(){
 	ip2dn_print(&ip2dn);
 	*/
 	struct dn2st_map dn2st;
-	dn2st_map_init(&dn2st, 10);
-	for(i = 0; i < 100; i++){
+	struct abntraf *abn;
+	int n,j;
+	dn2st_map_init(&dn2st, 5);
+	for(i = 0; i < 20; i++){
 		struct dn2st tmp;
 		ip = rand();
 		snprintf(buf,16,"0x%x",ip);
@@ -39,6 +43,15 @@ int main(){
 		tmp.intvl_cnt = rand();
 		tmp.mean = 1.0 * rand() / rand();
 		tmp.std_dev = 1.0 * rand() / rand();
+		tmp.ablist = NULL;
+		n = rand() % 4;
+		for(j = 0; j < n; j++){
+			abn = (struct abntraf*)malloc(sizeof(struct abntraf));
+			abn->cnt = rand();
+			gettimeofday(&abn->t,NULL);
+			abn->nxt = tmp.ablist;
+			tmp.ablist = abn;
+		}
 		dn2st_insert(&dn2st, &tmp);
 	}
 
