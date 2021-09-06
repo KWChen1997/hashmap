@@ -34,7 +34,7 @@ entry *find(struct map *map, char *key);
  * 	If there is a hit, the return pointer to the entry.
  * */
 
-int insert(struct map *map, struct ip2dn *entry);
+int insert(struct map *map, entry *entry);
 /*
  * Insert the entry into the map
  * Return value
