@@ -14,7 +14,7 @@
  * return value: the hash value
  * */
 
-uint32_t hash(uint32_t key, uint32_t cap){
+uint32_t ip2dn_hash(uint32_t key, uint32_t cap){
 	const uint32_t prime = 31;
 	int i = 0;
 	int l = sizeof(uint32_t);
@@ -55,7 +55,7 @@ int ip2dn_map_init(struct ip2dn_map *map, uint32_t increm){
  * */
 
 struct ip2dn *ip2dn_find(struct ip2dn_map *map, uint32_t key){
-	uint32_t hashval = hash(key, map->cap);
+	uint32_t hashval = ip2dn_hash(key, map->cap);
 	struct ip2dn *res = map->list + hashval;
 	while(res->valid && res->ip != key){
 		hashval = (hashval + 1) % map->cap;
