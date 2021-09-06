@@ -1,4 +1,4 @@
-# Simple Hash Map for ip/dn mapping
+# Simple Hash Map
 
 ## Entry data structure
 ```c=
