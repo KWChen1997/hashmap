@@ -1,7 +1,7 @@
 # Simple Hash Map for ip/dn mapping
 
 ## Entry data structure
-```sh=
+```c=
 struct entry {
 	char *key;
 	void *data;
@@ -11,9 +11,19 @@ struct entry {
 	- key and data should be malloced
 - all key should be a null-terminated string
 
+## Map data structure
+```c=
+struct map {
+	entry **list;			// store a list of address pointing the entry
+	node *head;			// linked list to store entries
+	uint32_t cap;			// size of list
+	uint32_t count;			// sizeof head list
+	void (*printmap)(struct map*);	//print out the entries in the map
+};
+```
 ## ip2dn Functions
 ```c=
-int map_init(struct map *map);
+int map_init(struct map *map, void (*p)(struct map*));
 /*
  * Initialize the map data structure
  * Return Value
