@@ -20,7 +20,7 @@ int map_init(struct map *map);
  *	If success, 0 will be returned. If failed, 1 will be returned.
  * */
 
-int hash(char *key, unsigned int cap); 
+uint32_t hash(char *key, unsigned int cap); 
 /*
  * Calculate the hash value according to the given key which is ip in these design
  * Return value
@@ -34,7 +34,7 @@ entry *find(struct map *map, char *key);
  * 	If there is a hit, the return pointer to the entry.
  * */
 
-uint32_t insert(struct map *map, struct ip2dn *entry);
+int insert(struct map *map, struct ip2dn *entry);
 /*
  * Insert the entry into the map
  * Return value
