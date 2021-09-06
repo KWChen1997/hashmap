@@ -11,6 +11,7 @@ all: $(PROGS)
 
 $(PROGS):$(OBJS) $(HEADS)
 	$(CC) $(CFLAGS) -o $@ $^
-
+src:
+	echo $(SRCS)
 clean:
 	rm -f *.o $(PROGS)

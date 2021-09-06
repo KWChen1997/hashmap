@@ -17,11 +17,12 @@ uint32_t hash(char *key, uint32_t cap){
 	return hashval;
 }
 
-int map_init(struct map *map){
+int map_init(struct map *map, printmap p){
 	map->list = (entry**)calloc(INCREM,sizeof(entry*));
 	map->head = NULL; 
 	map->cap = INCREM;
 	map->count = 0;
+	map->printmap = p;
 	return 0;
 }
 
@@ -52,7 +53,6 @@ int insert(struct map *map, entry *entry){
 }
 
 int expand(struct map *map){
-	uint32_t oldcap = map->cap;
 	map->cap += INCREM;
 	entry **oldlist = map->list;
 	map->list = (entry**)calloc(map->cap, sizeof(entry*));
@@ -74,24 +74,4 @@ int expand(struct map *map){
 		free(oldlist);
 
 	return 0;
-}
-
-void printmap(struct map *map){
-	entry *cur;
-	struct {
-		uint32_t ip;
-		char dn[256];
-	} *tmp;
-	int i = 0;
-	int j = 0;
-	for(i = 0; i < map->cap; i++){
-		if(map->list[i] == NULL)
-			continue;
-		cur = map->list[i];
-		tmp = cur->data;
-		printf("key %s data ip 0x%x dn %s\n", cur->key, tmp->ip, tmp->dn);
-		j++;
-	}
-	printf("count %d\n", j);
-	return;
 }
